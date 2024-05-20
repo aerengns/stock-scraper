@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Scraper API</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+<header>
+    <h1 class="title"><a href="#">Stock Scraper API</a></h1>
+</header>
+<div class="container">
+    <section id="introduction">
+        <h2>Introduction</h2>
+        <p>Welcome to the API documentation. Here you will find all the information you need to interact with our
+            API.</p>
+    </section>
+    <section id="authentication">
+        <h2>Authentication</h2>
+        <p>There is no need of authentication at the moment.</p>
+    </section>
+    <section id="endpoints">
+        <h2>Endpoints</h2>
+        <p>Here is a list of available endpoints:</p>
+        <ul class="endpoint-list">
+            <li><a href="#stocks">POST /api/stocks</a></li>
+        </ul>
+    </section>
+    <section id="stocks">
+        <h2>POST /api/stocks</h2>
+        <div class="endpoint">
+            <h3>Get all stock data (including dividends etc.) from last year to today.</h3>
+            <h4>Request</h4>
+            <pre><code>POST /api/stocks
+{
+    "stock_code": "MAVI"
+}</code></pre>
+            <h4>Response</h4>
+            <pre><code>{
+    "current_price": "99.10",
+    "history_data": [
+        {
+            "adj_close": "99.10",
+            "close": "99.10",
+            "date": "May 20, 2024",
+            "high": "100.20",
+            "low": "96.40",
+            "open": "98.65",
+            "volume": "4,635,052"
+        },
+        ...
+        {
+            "date": "May 6, 2024",
+            "event": "Dividend",
+            "value": "2.13"
+        },
+        ...
+        {
+            "adj_close": "26.45",
+            "close": "27.05",
+            "date": "May 22, 2023",
+            "high": "28.38",
+            "low": "26.70",
+            "open": "28.10",
+            "volume": "3,664,732"
+        }
+    ]
+
+}</code></pre>
+        </div>
+    </section>
+</div>
+<footer>
+    <p>&copy; 2024 <a href="https://github.com/aerengns">aerengns</a></p>
+</footer>
+</body>
+</html>

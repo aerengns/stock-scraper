@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -39,11 +39,11 @@ def parse_row(row):
 
 
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def home():
+    return render_template('index.html')
 
 
-@app.route('/stock', methods=['POST'])
+@app.route('/api/stocks', methods=['POST'])
 def fetch_stock_history():
     data = request.json
     stock_code = data.get('stock_code')
@@ -62,7 +62,7 @@ def fetch_stock_history():
     rows = table.find_elements('tag name', 'tr')
     history_data = [parse_row(row) for row in rows]
 
-    return jsonify({'current_value': current_value, 'history_data': history_data})
+    return jsonify({'current_price': current_value, 'history_data': history_data})
 
 
 @app.route('/shutdown', methods=['POST'])
