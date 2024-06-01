@@ -13,6 +13,7 @@ options = Options()
 options.add_argument('--headless')  # Uncomment if you want to run in headless mode
 options.add_argument('--no-sandbox')  # Required for running as root in some environments
 options.add_argument('--disable-dev-shm-usage')  # Overcome limited resource problems
+options.add_argument("--disable-gpu")  # applicable to windows os only
 options.page_load_strategy = 'none'
 driver = webdriver.Chrome(options=options)
 
