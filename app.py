@@ -17,7 +17,7 @@ options.add_argument('--headless')  # Uncomment if you want to run in headless m
 options.add_argument('--no-sandbox')  # Required for running as root in some environments
 options.add_argument('--disable-dev-shm-usage')  # Overcome limited resource problems
 options.add_argument("--disable-gpu")  # applicable to windows os only
-options.page_load_strategy = 'none'
+options.page_load_strategy = 'eager'
 driver = webdriver.Chrome(options=options)
 
 BASE_URL = "https://finance.yahoo.com/quote/{}.IS/history/?filter=history&frequency=1d&period1={}&period2={}"
@@ -63,7 +63,7 @@ def fetch_stock_history(stock_code, start_date, end_date):
         current_value = current_value_element.text
     except Exception as e:
         print(f'Error while fetching the current value: {e}')
-        current_value = ''
+        return {'current_price': None, 'history_data': []}
 
     table_xpath = "//table/tbody"
     table = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, table_xpath)))
