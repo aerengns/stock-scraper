@@ -1,6 +1,7 @@
 import time
 
 from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -8,6 +9,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 app = Flask(__name__)
+CORS(app)
+
 # Initialize the WebDriver globally
 options = Options()
 options.add_argument('--headless')  # Uncomment if you want to run in headless mode
