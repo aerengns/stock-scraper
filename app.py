@@ -25,33 +25,39 @@ BASE_URL = "https://finance.yahoo.com/quote/{}.IS/history/?filter=history&freque
 
 def parse_row(row):
     cells = row.find_elements('tag name', 'td')
-    if len(cells) == 7:
-        return {
-            'date': cells[0].text,
-            'open': cells[1].text,
-            'high': cells[2].text,
-            'low': cells[3].text,
-            'close': cells[4].text,
-            'adj_close': cells[5].text,
-            'volume': cells[6].text,
-        }
-    elif len(cells) == 2:
-        return {
-            'date': cells[0].text,
-            'value': cells[1].text.split()[0],
-            'event': cells[1].text.split()[1],
-        }
-    else:
-        print('Unexpected number of cells in the row')
-        for cell in cells:
-            print(cell.text)
+    try:
+        if len(cells) == 7:
+            return {
+                'date': cells[0].text,
+                'open': cells[1].text,
+                'high': cells[2].text,
+                'low': cells[3].text,
+                'close': cells[4].text,
+                'adj_close': cells[5].text,
+                'volume': cells[6].text,
+                'type': 'price'
+            }
+        elif len(cells) == 2:
+            return {
+                'date': cells[0].text,
+                'value': cells[1].text.split()[0],
+                'event': cells[1].text.split()[1],
+                'type': 'event'
+            }
+        else:
+            print('Unexpected number of cells in the row')
+            for cell in cells:
+                print(cell.text)
+            return None
+    except Exception as e:
+        print(f'Error while parsing the row: {e}')
         return None
 
 
 def fetch_stock_history(stock_code, start_date, end_date):
     driver.get(BASE_URL.format(stock_code, start_date, end_date))
 
-    xpath = '//fin-streamer/span'
+    xpath = '/html/body/div[1]/main/section/section/section/article/section[1]/div[2]/div[1]/section/div/section/div[1]/fin-streamer[1]/span'
     current_value_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath)))
     current_value = current_value_element.text
 
