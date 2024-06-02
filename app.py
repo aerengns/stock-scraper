@@ -58,8 +58,12 @@ def fetch_stock_history(stock_code, start_date, end_date):
     driver.get(BASE_URL.format(stock_code, start_date, end_date))
 
     xpath = '/html/body/div[1]/main/section/section/section/article/section[1]/div[2]/div[1]/section/div/section/div[1]/fin-streamer[1]/span'
-    current_value_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath)))
-    current_value = current_value_element.text
+    try:
+        current_value_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath)))
+        current_value = current_value_element.text
+    except Exception as e:
+        print(f'Error while fetching the current value: {e}')
+        current_value = ''
 
     table_xpath = "//table/tbody"
     table = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, table_xpath)))
