@@ -1,3 +1,4 @@
+import datetime
 import time
 
 from flask import Flask, request, jsonify, render_template
@@ -19,8 +20,7 @@ options.add_argument('--disable-dev-shm-usage')  # Overcome limited resource pro
 options.add_argument("--disable-gpu")  # applicable to windows os only
 options.page_load_strategy = 'eager'
 driver = webdriver.Chrome(options=options)
-
-BASE_URL = "https://finance.yahoo.com/quote/{}.IS/history/?filter=history&frequency=1d&period1={}&period2={}"
+BASE_URL = "https://finance.yahoo.com/quote/{}.IS/history/?period1={}&period2={}&guccounter=1"
 
 
 def parse_row(row):
@@ -82,13 +82,17 @@ def home():
 def fetch_stock_history_handler():
     data = request.json
     stock_code = data.get('stock_code')
-    start_date = data.get('start_date', 1514764800)  # 1st January 2018
+    # start_date = data.get('start_date', 1514764800)  # 1st January 2018
+    start_date = data.get('start_date', datetime.datetime(datetime.datetime.now().year, 1,
+                                                          1).timestamp())  # 1st January of the current year
     end_date = data.get('end_date', int(time.time()))
 
     if not stock_code:
         return jsonify({"error": "stock_code is required"}), 400
-
-    return jsonify(fetch_stock_history(stock_code, start_date, end_date))
+    history_data = fetch_stock_history(stock_code, start_date, end_date)
+    if history_data['current_price'] is None:
+        return jsonify({"error": "Failed to fetch the data"}), 500
+    return jsonify(history_data)
 
 
 @app.route('/shutdown', methods=['POST'])
