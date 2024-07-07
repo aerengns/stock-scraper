@@ -38,10 +38,13 @@ def parse_row(row):
                 'type': 'price'
             }
         elif len(cells) == 2:
+            split_values = cells[1].text.split()
+            value, event = split_values[0], split_values[1:]
+            event = ' '.join(event)
             return {
                 'date': cells[0].text,
-                'value': cells[1].text.split()[0],
-                'event': cells[1].text.split()[1],
+                'value': value,
+                'event': event,
                 'type': 'event'
             }
         else:
