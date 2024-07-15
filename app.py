@@ -23,6 +23,12 @@ driver = webdriver.Chrome(options=options)
 BASE_URL = "https://finance.yahoo.com/quote/{}.IS/history/?period1={}&period2={}&guccounter=1"
 
 
+def currency_to_float(currency_str, locale):
+    if locale == 'TRY':
+        currency_str = currency_str.replace(',', '')
+    return float(currency_str)
+
+
 def parse_row(row):
     cells = row.find_elements('tag name', 'td')
     try:
@@ -109,7 +115,7 @@ def currency_converter():
                 EC.element_to_be_clickable((By.XPATH, cookie_consent_button_xpath)))
             cookie_consent_button.click()
         except Exception as e:
-            print(f'Cookie consent button not found or not clickable: {e}')
+            print(f'Cookie consent button not found or not clickable')
 
         date_element.click()
         driver.execute_script("arguments[0].value = '';", date_element)
@@ -121,7 +127,10 @@ def currency_converter():
     value_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, value_xpath)))
     value = value_element.get_attribute('value')
 
-    return jsonify({'converted_amount': float(value)})
+    converted_amount = currency_to_float(value, to_currency)
+
+    return jsonify({'converted_amount': converted_amount,
+                    'conversion_rate': converted_amount / amount})
 
 
 @app.route('/api/stocks', methods=['POST'])
