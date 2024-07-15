@@ -81,11 +81,53 @@ def home():
     return render_template('index.html')
 
 
+@app.route('/api/currency', methods=['POST'])
+def currency_converter():
+    data = request.json
+    from_currency = data.get('from_currency')
+    to_currency = data.get('to_currency')
+    amount = data.get('amount')
+    date = data.get('date')
+
+    url = 'https://www.oanda.com/currency-converter/en/?from={}&to={}&amount={}'.format(from_currency, to_currency,
+                                                                                        amount)
+    driver.get(url)
+    time.sleep(2)
+
+    if date is not None:
+        date_xpath = '/html/body/div/main/div[1]/div/div/div[3]/div/div[1]/div[1]/div/div[3]/div[1]/div[2]/div/div/input'
+        date_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, date_xpath)))
+        try:
+            date_obj = datetime.datetime.fromisoformat(date)
+            formatted_date = date_obj.strftime('%d %B %Y')
+        except ValueError:
+            return jsonify({'error': 'Invalid date format. Expected format is YYYY-MM-DD.'}), 400
+
+        cookie_consent_button_xpath = '//*[@id="onetrust-accept-btn-handler"]'
+        try:
+            cookie_consent_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, cookie_consent_button_xpath)))
+            cookie_consent_button.click()
+        except Exception as e:
+            print(f'Cookie consent button not found or not clickable: {e}')
+
+        date_element.click()
+        driver.execute_script("arguments[0].value = '';", date_element)
+        date_element.send_keys(formatted_date)
+        date_element.send_keys(u'\ue007')
+        time.sleep(1)
+
+    value_xpath = '/html/body/div/main/div[1]/div/div/div[3]/div/div[1]/div[1]/div/div[2]/div[3]/div[2]/div[1]/div/input'
+    value_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, value_xpath)))
+    value = value_element.get_attribute('value')
+
+    return jsonify({'converted_amount': float(value)})
+
+
 @app.route('/api/stocks', methods=['POST'])
 def fetch_stock_history_handler():
     data = request.json
     stock_code = data.get('stock_code')
-    # start_date = data.get('start_date', 1514764800)  # 1st January 2018
     start_date = data.get('start_date', datetime.datetime(datetime.datetime.now().year, 1,
                                                           1).timestamp())  # 1st January of the current year
     end_date = data.get('end_date', int(time.time()))

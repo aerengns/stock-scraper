@@ -25,6 +25,7 @@
         <p>Here is a list of available endpoints:</p>
         <ul class="endpoint-list">
             <li><a href="#stocks">POST /api/stocks</a></li>
+            <li><a href="#currency">POST /api/currency</a></li>
         </ul>
     </section>
     <section id="stocks">
@@ -72,6 +73,24 @@
         }
     ]
 
+}</code></pre>
+        </div>
+    </section>
+    <section id="currency">
+        <h2>POST /api/currency</h2>
+        <div class="endpoint">
+            <h3>Convert currency from one to another at a specific date.</h3>
+            <h4>Request</h4>
+            <pre><code>POST /api/currency
+{
+    "from_currency": "TRY"
+    "to_currency": "USD"
+    "amount": 100
+    "date": "2023-05-12T13:22:58.898Z" // default value TODAY
+}</code></pre>
+            <h4>Response</h4>
+            <pre><code>{
+    "converted_amount": 5.10872
 }</code></pre>
         </div>
     </section>
