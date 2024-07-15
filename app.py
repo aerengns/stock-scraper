@@ -99,6 +99,13 @@ def currency_converter():
                                                                                         amount)
     driver.get(url)
     time.sleep(2)
+    try:
+        cookie_consent_button_xpath = '//*[@id="onetrust-accept-btn-handler"]'
+        cookie_consent_button = WebDriverWait(driver, 1).until(
+            EC.element_to_be_clickable((By.XPATH, cookie_consent_button_xpath)))
+        cookie_consent_button.click()
+    except Exception as e:
+        print(f'Cookie consent button not found or not clickable')
 
     if date is not None:
         date_xpath = '/html/body/div/main/div[1]/div/div/div[3]/div/div[1]/div[1]/div/div[3]/div[1]/div[2]/div/div/input'
@@ -108,14 +115,6 @@ def currency_converter():
             formatted_date = date_obj.strftime('%d %B %Y')
         except ValueError:
             return jsonify({'error': 'Invalid date format. Expected format is YYYY-MM-DD.'}), 400
-
-        cookie_consent_button_xpath = '//*[@id="onetrust-accept-btn-handler"]'
-        try:
-            cookie_consent_button = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, cookie_consent_button_xpath)))
-            cookie_consent_button.click()
-        except Exception as e:
-            print(f'Cookie consent button not found or not clickable')
 
         date_element.click()
         driver.execute_script("arguments[0].value = '';", date_element)
