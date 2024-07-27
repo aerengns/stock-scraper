@@ -34,7 +34,7 @@ def parse_row(row):
     try:
         if len(cells) == 7:
             return {
-                'date': cells[0].text,
+                'date': datetime.datetime.strptime(cells[0].text, "%b %d, %Y"),
                 'open': cells[1].text,
                 'high': cells[2].text,
                 'low': cells[3].text,
@@ -48,7 +48,7 @@ def parse_row(row):
             value, event = split_values[0], split_values[1:]
             event = ' '.join(event)
             return {
-                'date': cells[0].text,
+                'date': datetime.datetime.strptime(cells[0].text, "%b %d, %Y"),
                 'value': value,
                 'event': event,
                 'type': 'event'
@@ -93,7 +93,7 @@ def currency_converter():
     from_currency = data.get('from_currency')
     to_currency = data.get('to_currency')
     amount = data.get('amount')
-    date = data.get('date')
+    date_list = data.get('date_list')
 
     url = 'https://www.oanda.com/currency-converter/en/?from={}&to={}&amount={}'.format(from_currency, to_currency,
                                                                                         amount)
@@ -107,9 +107,11 @@ def currency_converter():
     except Exception as e:
         print(f'Cookie consent button not found or not clickable')
 
-    if date is not None:
-        date_xpath = '/html/body/div/main/div[1]/div/div/div[3]/div/div[1]/div[1]/div/div[3]/div[1]/div[2]/div/div/input'
-        date_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, date_xpath)))
+    response = []
+
+    date_xpath = '/html/body/div/main/div[1]/div/div/div[3]/div/div[1]/div[1]/div/div[3]/div[1]/div[2]/div/div/input'
+    date_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, date_xpath)))
+    for date in date_list:
         try:
             date_obj = datetime.datetime.fromisoformat(date)
             formatted_date = date_obj.strftime('%d %B %Y')
@@ -117,19 +119,21 @@ def currency_converter():
             return jsonify({'error': 'Invalid date format. Expected format is YYYY-MM-DD.'}), 400
 
         date_element.click()
-        driver.execute_script("arguments[0].value = '';", date_element)
+        time.sleep(0.05)
+        date_element.send_keys(u'\ue009' + 'a')
+        date_element.send_keys(u'\ue003')
         date_element.send_keys(formatted_date)
         date_element.send_keys(u'\ue007')
-        time.sleep(1)
+        time.sleep(0.5)
 
-    value_xpath = '/html/body/div/main/div[1]/div/div/div[3]/div/div[1]/div[1]/div/div[2]/div[3]/div[2]/div[1]/div/input'
-    value_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, value_xpath)))
-    value = value_element.get_attribute('value')
-
-    converted_amount = currency_to_float(value, to_currency)
-
-    return jsonify({'converted_amount': converted_amount,
-                    'conversion_rate': converted_amount / amount})
+        value_xpath = '/html/body/div/main/div[1]/div/div/div[3]/div/div[1]/div[1]/div/div[2]/div[3]/div[2]/div[1]/div/input'
+        value_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, value_xpath)))
+        value = value_element.get_attribute('value')
+        value_element.click()
+        converted_amount = currency_to_float(value, to_currency)
+        response.append(
+            {'date': date, 'converted_amount': converted_amount, 'conversion_rate': converted_amount / amount})
+    return jsonify(response)
 
 
 @app.route('/api/stocks', methods=['POST'])

@@ -85,14 +85,32 @@
 {
     "from_currency": "TRY"
     "to_currency": "USD"
-    "amount": 100
-    "date": "2023-05-12T13:22:58.898Z" // default value TODAY
+    "amount": 1
+    "date_list": [
+        "2020-12-31T21:00:00.000Z",
+        "2022-01-01T21:00:00.000Z",
+       "2024-01-02T21:00:00.000Z"
+    ],
 }</code></pre>
             <h4>Response</h4>
-            <pre><code>{
-    "converted_amount": 5.10872
-    "conversion_rate": 0.0510872
-}</code></pre>
+            <pre><code>[
+  {
+    conversion_rate: 0.13557,
+    converted_amount: 0.13557,
+    date: '2020-12-31T21:00:00.000Z'
+  },
+  {
+    conversion_rate: 0.0748,
+    converted_amount: 0.0748,
+    date: '2022-01-01T21:00:00.000Z'
+  },
+  {
+    conversion_rate: 0.03361,
+    converted_amount: 0.03361,
+    date: '2024-01-02T21:00:00.000Z'
+  }
+]
+</code></pre>
         </div>
     </section>
 </div>
