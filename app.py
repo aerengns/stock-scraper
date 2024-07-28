@@ -77,7 +77,14 @@ def fetch_stock_history(stock_code, start_date, end_date):
     table_xpath = "//table/tbody"
     table = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, table_xpath)))
     rows = table.find_elements(By.TAG_NAME, 'tr')
-    history_data = [parse_row(row) for row in rows]
+    history_data = []
+    total_rows = len(rows)
+    for ind, row in enumerate(rows):
+        parsed_row = parse_row(row)
+        history_data.append(parsed_row)
+        if ind % 10 == 0:
+            print(f'Fetched {ind} of {total_rows} rows')
+    print(f'Fetched {total_rows} rows in total')
 
     return {'current_price': current_value, 'history_data': history_data}
 
@@ -111,7 +118,8 @@ def currency_converter():
 
     date_xpath = '/html/body/div/main/div[1]/div/div/div[3]/div/div[1]/div[1]/div/div[3]/div[1]/div[2]/div/div/input'
     date_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, date_xpath)))
-    for date in date_list:
+    date_list_len = len(date_list)
+    for ind, date in enumerate(date_list):
         try:
             date_obj = datetime.datetime.fromisoformat(date)
             formatted_date = date_obj.strftime('%d %B %Y')
@@ -132,7 +140,11 @@ def currency_converter():
         value_element.click()
         converted_amount = currency_to_float(value, to_currency)
         response.append(
-            {'date': date, 'converted_amount': converted_amount, 'conversion_rate': converted_amount / amount})
+            {'date': datetime.datetime.strptime(formatted_date, "%d %B %Y").date(),
+             'converted_amount': converted_amount,
+             'conversion_rate': converted_amount / amount})
+        if ind % 10 == 0:
+            print(f'Fetched {ind} of {date_list_len} dates')
     return jsonify(response)
 
 
