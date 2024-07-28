@@ -124,7 +124,7 @@ def currency_converter():
         date_element.send_keys(u'\ue003')
         date_element.send_keys(formatted_date)
         date_element.send_keys(u'\ue007')
-        time.sleep(0.5)
+        time.sleep(0.15)
 
         value_xpath = '/html/body/div/main/div[1]/div/div/div[3]/div/div[1]/div[1]/div/div[2]/div[3]/div[2]/div[1]/div/input'
         value_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, value_xpath)))
