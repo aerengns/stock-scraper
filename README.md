@@ -6,7 +6,7 @@ This project is a web application built with Flask that scrapes stock informatio
 to users in a clean and accessible format. The application fetches the latest or historical stock prices and other
 relevant data such as dividends etc.
 
-If you want to only use the API you can go to https://aerengns.pythonanywhere.com/
+If you want to only use the API you can go to https://stock-scraper-vyg8.onrender.com
 
 ## Features
 
