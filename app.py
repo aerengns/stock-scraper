@@ -172,9 +172,8 @@ def shutdown():
 
 @app.route('/healthcheck', methods=['GET'])
 def healthcheck():
-    driver.get('https://www.google.com/')
     return 'OK'
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run('0.0.0.0')
