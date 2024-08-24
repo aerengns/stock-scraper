@@ -170,7 +170,7 @@ def shutdown():
     return 'WebDriver has been shut down'
 
 
-@app.route('healthcheck', methods=['GET'])
+@app.route('/healthcheck', methods=['GET'])
 def healthcheck():
     return 'OK'
 
