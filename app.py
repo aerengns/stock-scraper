@@ -170,5 +170,10 @@ def shutdown():
     return 'WebDriver has been shut down'
 
 
+@app.route('healthcheck', methods=['GET'])
+def healthcheck():
+    return 'OK'
+
+
 if __name__ == '__main__':
     app.run()
