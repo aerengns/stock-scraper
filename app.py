@@ -172,6 +172,7 @@ def shutdown():
 
 @app.route('/healthcheck', methods=['GET'])
 def healthcheck():
+    driver.get('https://www.google.com/')
     return 'OK'
 
 
