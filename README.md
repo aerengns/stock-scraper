@@ -6,8 +6,6 @@ This project is a web application built with Flask that scrapes stock informatio
 to users in a clean and accessible format. The application fetches the latest or historical stock prices and other
 relevant data such as dividends etc.
 
-If you want to only use the API you can go to https://stock-scraper-vyg8.onrender.com
-
 ## Features
 
 - Real-time stock price fetching
@@ -32,8 +30,8 @@ cd stock-scraper
 ### 2. Create a Virtual Environment
 
 ```bash
-python -m venv venv
-source venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 ```
 
 ### 3. Install Required Packages
@@ -52,7 +50,7 @@ The application will be running at `http://127.0.0.1:5000`
 
 ## Usage
 
-Call the API points listed at  https://aerengns.pythonanywhere.com/
+Call the API points listed at https://aerengns.pythonanywhere.com/
 
 ## License
 
