@@ -16,7 +16,7 @@ CORS(app)
 
 # Initialize the WebDriver globally
 options = Options()
-options.add_argument("--headless")
+# options.add_argument("--headless")
 options.add_argument("--no-sandbox")  # Required for running as root in some environments
 options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
 options.add_argument("--disable-gpu")  # applicable to windows os only
@@ -115,26 +115,44 @@ def fetch_stock_history(stock_code, start_date, end_date):
 
     handle_loader_container_yahoo()
 
-    css_selector = "#main-content-wrapper > section.container.yf-lvcj7u > div.bottom.yf-lvcj7u > div.price.yf-lvcj7u > section > div > section > div.container.yf-1vmxbei > div:nth-child(1) > span"
+    xpath_selector = "/html/body/div[1]/div[4]/main/section/section/section/section/section[1]/div[2]/div[1]/section/div/section/div[1]/span[1]"
 
     try:
+        print(f"Scraping current price")
         current_value_element = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, css_selector))
+            EC.presence_of_element_located((By.XPATH, xpath_selector))
         )
         current_value = current_value_element.text
         print(f"✓ Found current price: {current_value}")
     except Exception as e:
+        import traceback
         print(f"Error while fetching the current value: {e}")
-        # Save screenshot for debugging
-        driver.save_screenshot("debug_price_error.png")
-        print("Screenshot saved to debug_price_error.png")
+        print("Python Traceback:")
+        traceback.print_exc()
+        
+        try:
+            print(f"Current URL at time of error: {driver.current_url}")
+            
+            # Save screenshot for debugging
+            driver.save_screenshot("debug_price_error.png")
+            print("Screenshot saved to debug_price_error.png")
+            
+            # Save page source for deeper debugging (since selectors might be brittle or bot detection active)
+            with open("debug_page_source.html", "w", encoding="utf-8") as f:
+                f.write(driver.page_source)
+            print("Page source saved to debug_page_source.html")
+        except Exception as inner_e:
+            print(f"Failed to save debug info: {inner_e}")
+            
         return {"current_price": None, "history_data": []}
 
     table_xpath = "//table/tbody"
+    print(f"Scraping table data")
     table = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, table_xpath)))
     rows = table.find_elements(By.TAG_NAME, "tr")
     history_data = []
     total_rows = len(rows)
+    print(f"Found {total_rows} rows")
     for ind, row in enumerate(rows):
         parsed_row = parse_row(row)
         history_data.append(parsed_row)
@@ -164,21 +182,25 @@ def currency_converter():
     driver.get(url)
     time.sleep(2)
     try:
+        print(f"Try to handle cookie consent")
         cookie_consent_button_xpath = '//*[@id="onetrust-accept-btn-handler"]'
         cookie_consent_button = WebDriverWait(driver, 1).until(
             EC.element_to_be_clickable((By.XPATH, cookie_consent_button_xpath))
         )
         cookie_consent_button.click()
+        print(f"✓ Cookie consent accepted")
     except Exception as e:
         print("Cookie consent button not found or not clickable")
 
     response = []
 
     # TODO: Use selectors instead of XPaths
-    date_xpath = "/html/body/div/main/div[1]/div/div/div[3]/div/div[1]/div[1]/div/div[3]/div[1]/div[2]/div/div/input"
+    date_xpath = "/html/body/div[1]/main/div[2]/div/div/div[3]/div/div[1]/div[1]/div/div[3]/div[1]/div[2]/div/div/input"
+    print(f"Try to find the date element")
     date_element = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.XPATH, date_xpath))
     )
+    print(f"✓ Found the date element")
     date_list_len = len(date_list)
     for ind, date in enumerate(date_list):
         try:
@@ -196,10 +218,12 @@ def currency_converter():
         time.sleep(0.15)
 
         # TODO: Use selectors instead of XPaths
-        value_xpath = "/html/body/div/main/div[1]/div/div/div[3]/div/div[1]/div[1]/div/div[2]/div[3]/div[2]/div[1]/div/input"
+        value_xpath = "/html/body/div[1]/main/div[2]/div/div/div[3]/div/div[1]/div[1]/div/div[2]/div[3]/div[2]/div[1]/div/input"
+        print(f"Try to find the value element")
         value_element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, value_xpath))
         )
+        print(f"✓ Found the value element")
         value = value_element.get_attribute("value")
         value_element.click()
         converted_amount = currency_to_float(value, to_currency)
@@ -212,6 +236,7 @@ def currency_converter():
         )
         if ind % 10 == 0:
             print(f"Fetched {ind} of {date_list_len} dates")
+    print(f"✓ Fetched all dates")
     return jsonify(response)
 
 
